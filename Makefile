@@ -8,9 +8,9 @@ init:
 gen-trusted-ssl-ci-hack:
 	mkcert -install
 
-	cp "/home/runner/.local/share/mkcert/rootCA-key.pem" ./ca/trusted.key
-	cp "/home/runner/.local/share/mkcert/rootCA.pem" ./ca/trusted.crt
-	cp "/home/runner/.local/share/mkcert/rootCA.pem" ./ca/trusted.pem
+	cp "$(mkcert -CAROOT)/rootCA-key.pem" ./ca/trusted.key
+	cp "$(mkcert -CAROOT)/rootCA.pem" ./ca/trusted.crt
+	cp "$(mkcert -CAROOT)/rootCA.pem" ./ca/trusted.pem
 
 	CANAME=trusted OUTPATH=./ssl ./ssl-self-signed.sh d localhost-okok localhost
 

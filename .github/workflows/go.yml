@@ -32,13 +32,6 @@ jobs:
     - name: Gen and run infra
       run: |
         mkcert -version
-        mkcert -install
-        mkcert -CAROOT
-        ls -lha /home/runner/.local/share/mkcert
-
-        echo "ls lha BEGIN"
-        ls -lha "$(mkcert -CAROOT)"
-        echo "ls lha END"
 
         make gen-trusted-ssl-ci-hack
 
