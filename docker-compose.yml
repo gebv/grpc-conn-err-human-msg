@@ -1,0 +1,53 @@
+version: '3.4'
+x-reverseproxy: &reverseproxy
+  image: nginx:mainline-alpine
+  restart: unless-stopped
+  depends_on:
+    - app
+  volumes:
+    - ./gprc443:/etc/nginx/conf.d/gprc443:ro
+    - ./ssl:/etc/nginx/ssl:ro
+  depends_on:
+    - app
+  command:
+    - /bin/sh
+    - -c
+    - |
+      rm -rf /etc/nginx/conf.d/default.conf
+      envsubst '$$SSLCERT $$SSLPRIV $$APPHOST' < /etc/nginx/conf.d/gprc443 > /etc/nginx/conf.d/default.conf
+      exec nginx -g 'daemon off;'
+services:
+  app:
+    build:
+      context: .
+      target: 'webapp'
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      PORT: "8080"
+    ports:
+      - 127.0.0.1:10001:8080
+  sslok:
+    <<: *reverseproxy
+    ports:
+      - "127.0.0.1:10010:443"
+    environment:
+      APPHOST: app:8080
+      SSLCERT: localhost-ok.crt
+      SSLPRIV: localhost-ok.key
+  sslexpired:
+    <<: *reverseproxy
+    ports:
+      - "127.0.0.1:10020:443"
+    environment:
+      APPHOST: app:8080
+      SSLCERT: localhost-expired.crt
+      SSLPRIV: localhost-expired.key
+  sslsimple:
+    <<: *reverseproxy
+    ports:
+      - "127.0.0.1:10030:443"
+    environment:
+      APPHOST: app:8080
+      SSLCERT: localhost-simple.crt
+      SSLPRIV: localhost-simple.key
