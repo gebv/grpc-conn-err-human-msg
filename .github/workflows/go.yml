@@ -37,6 +37,8 @@ jobs:
         mkcert -install
         echo "CAROOT"
         mkcert -CAROOT
+        echo "ls lha"
+        ls -lha /home/runner/.local/share/mkcert
 
         make gen-trusted-ssl
 

@@ -8,13 +8,13 @@ init:
 gen-trusted-ssl: init
 	mkcert -install
 
-	TRUSTEDCAROOT="$(mkcert -CAROOT)"
+	export TRUSTEDCAROOT="$(mkcert -CAROOT)"
 
-	cp "${TRUSTEDCAROOT}/rootCA-key.pem" ./ca/trusted.key
-	cp "${TRUSTEDCAROOT}/rootCA.pem" ./ca/trusted.crt
-	cp "${TRUSTEDCAROOT}/rootCA.pem" ./ca/trusted.pem
+	# cp "${TRUSTEDCAROOT}/rootCA-key.pem" ./ca/trusted.key
+	# cp "${TRUSTEDCAROOT}/rootCA.pem" ./ca/trusted.crt
+	# cp "${TRUSTEDCAROOT}/rootCA.pem" ./ca/trusted.pem
 
-	CANAME=trusted OUTPATH=./ssl ./ssl-self-signed.sh d localhost-okok localhost
+	# CANAME=trusted OUTPATH=./ssl ./ssl-self-signed.sh d localhost-okok localhost
 
 gen-ssl: init
 	CANAME=ok ./ssl-self-signed.sh c
