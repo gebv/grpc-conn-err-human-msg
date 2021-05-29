@@ -33,7 +33,7 @@ jobs:
       run: |
         mkcert -version
 
-        make gen-trusted-ssl-ci-hack
+        make gen-trusted-ssl
 
         make run
         sleep 5

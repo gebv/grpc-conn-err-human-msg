@@ -6,22 +6,12 @@ init:
 	mkdir -p ./ssl
 	mkdir -p ./ca
 
-gen-trusted-ssl-ci-hack:
+gen-trusted-ssl:
 	mkcert -install
 
 	$(SIGNTOOL) mkcert-copy-trusted-ca trusted
 
 	CANAME=trusted OUTPATH=./ssl $(SIGNTOOL) d localhost-okok localhost
-
-gen-trusted-ssl: init
-	mkcert -install
-	export TRUSTEDCAROOT="$(mkcert -CAROOT)"
-
-	cp "${TRUSTEDCAROOT}/rootCA-key.pem" ./ca/trusted.key
-	cp "${TRUSTEDCAROOT}/rootCA.pem" ./ca/trusted.crt
-	cp "${TRUSTEDCAROOT}/rootCA.pem" ./ca/trusted.pem
-
-	# CANAME=trusted OUTPATH=./ssl $(SIGNTOOL) d localhost-okok localhost
 
 gen-ssl: init
 	CANAME=ok $(SIGNTOOL) c
