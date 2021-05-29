@@ -1,5 +1,6 @@
 
 export CAPATH=./ca
+SIGNTOOL=./ssl-tools.sh
 
 init:
 	mkdir -p ./ssl
@@ -8,11 +9,9 @@ init:
 gen-trusted-ssl-ci-hack:
 	mkcert -install
 
-	cp "$(mkcert -CAROOT)/rootCA-key.pem" ./ca/trusted.key
-	cp "$(mkcert -CAROOT)/rootCA.pem" ./ca/trusted.crt
-	cp "$(mkcert -CAROOT)/rootCA.pem" ./ca/trusted.pem
+	$(SIGNTOOL) mkcert-copy-trusted-ca trusted
 
-	CANAME=trusted OUTPATH=./ssl ./ssl-self-signed.sh d localhost-okok localhost
+	CANAME=trusted OUTPATH=./ssl $(SIGNTOOL) d localhost-okok localhost
 
 gen-trusted-ssl: init
 	mkcert -install
@@ -22,14 +21,14 @@ gen-trusted-ssl: init
 	cp "${TRUSTEDCAROOT}/rootCA.pem" ./ca/trusted.crt
 	cp "${TRUSTEDCAROOT}/rootCA.pem" ./ca/trusted.pem
 
-	# CANAME=trusted OUTPATH=./ssl ./ssl-self-signed.sh d localhost-okok localhost
+	# CANAME=trusted OUTPATH=./ssl $(SIGNTOOL) d localhost-okok localhost
 
 gen-ssl: init
-	CANAME=ok ./ssl-self-signed.sh c
+	CANAME=ok $(SIGNTOOL) c
 
-	CANAME=ok OUTPATH=./ssl ./ssl-self-signed.sh d localhost-ok localhost
-	CANAME=ok OUTPATH=./ssl ./ssl-self-signed.sh d localhost-expired localhost 0
-	CANAME=ok OUTPATH=./ssl ./ssl-self-signed.sh s localhost-simple localhost
+	CANAME=ok OUTPATH=./ssl $(SIGNTOOL) d localhost-ok localhost
+	CANAME=ok OUTPATH=./ssl $(SIGNTOOL) d localhost-expired localhost 0
+	CANAME=ok OUTPATH=./ssl $(SIGNTOOL) s localhost-simple localhost
 
 proto-gen-install:
 	GO111MODULE=on go get google.golang.org/protobuf/cmd/protoc-gen-go@v1.26

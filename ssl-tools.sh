@@ -17,6 +17,13 @@ echo "root CA lifetime '${caDays}' days (env CADAYS)"
 echo
 
 case "$1" in
+    "mkcert-copy-root" | 'croot' )
+      name=$2
+      echo "name '${name}'"
+      cp "$(mkcert -CAROOT)/rootCA-key.pem" ${caPath}/$name.key
+      cp "$(mkcert -CAROOT)/rootCA.pem" ${caPath}/$name.crt
+      cp "$(mkcert -CAROOT)/rootCA.pem" ${caPath}/$name.pem
+    ;;
     "ca" | "c" | "C"  )
       openssl \
         req -x509 \
