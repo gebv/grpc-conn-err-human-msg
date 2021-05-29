@@ -51,3 +51,11 @@ services:
       APPHOST: app:8080
       SSLCERT: localhost-simple.crt
       SSLPRIV: localhost-simple.key
+  sslokok:
+    <<: *reverseproxy
+    ports:
+      - "127.0.0.1:10040:443"
+    environment:
+      APPHOST: app:8080
+      SSLCERT: localhost-okok.crt
+      SSLPRIV: localhost-okok.key

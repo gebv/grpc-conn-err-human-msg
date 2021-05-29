@@ -2,12 +2,16 @@ package main
 
 import (
 	"context"
+	"crypto/sha1"
+	"crypto/tls"
+	"fmt"
 	"testing"
 	"time"
 
 	pb "github.com/gebv/grpc-conn-err-human-msg/api/services/simple"
 	"github.com/gebv/grpc-conn-err-human-msg/grpcx"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 )
 
@@ -324,4 +328,81 @@ func TestSSLExpired(t *testing.T) {
 			grpcx.AddStdGRPCOptions(opts...))
 		assert.Error(t, err)
 	})
+}
+
+func TestTrustedRootCA(t *testing.T) {
+	addr := "localhost:10040"
+	fingerprintOK := FingerprintServerCert(t, addr)
+	require.NotEmpty(t, fingerprintOK)
+
+	t.Run("skipVerifyTLS", func(t *testing.T) {
+		t.Parallel()
+		var opts []grpc.DialOption
+		opts = append(opts, grpc.WithBlock())
+		opts = append(opts, grpc.WithTimeout(1*time.Second))
+
+		ctx := context.Background()
+
+		conn, _, err := grpcx.Dial(ctx, addr, time.Second, grpcx.SkipTLSVerify(), grpcx.AddStdGRPCOptions(opts...))
+		if err != nil {
+			t.Fatalf("fail to dial: %v", err)
+		}
+
+		defer conn.Close()
+		conn.GetState()
+		checkRequest(t, conn)
+	})
+	t.Run("withVerifyTLS", func(t *testing.T) {
+		t.Parallel()
+		var opts []grpc.DialOption
+		opts = append(opts, grpc.WithBlock())
+		opts = append(opts, grpc.WithTimeout(1*time.Second))
+
+		ctx := context.Background()
+
+		conn, _, err := grpcx.Dial(ctx, addr, time.Second,
+			grpcx.AddStdGRPCOptions(opts...))
+		if err != nil {
+			t.Fatalf("fail to dial: %v", err)
+		}
+
+		defer conn.Close()
+		conn.GetState()
+		checkRequest(t, conn)
+	})
+	t.Run("withVerifyTLS-fingerprintOK", func(t *testing.T) {
+		t.Parallel()
+		var opts []grpc.DialOption
+		opts = append(opts, grpc.WithBlock())
+		opts = append(opts, grpc.WithTimeout(1*time.Second))
+
+		ctx := context.Background()
+
+		conn, _, err := grpcx.Dial(ctx, addr, time.Second,
+			grpcx.Fingerprint(fingerprintOK),
+			grpcx.AddStdGRPCOptions(opts...))
+		if err != nil {
+			t.Fatalf("fail to dial: %v", err)
+		}
+
+		defer conn.Close()
+		conn.GetState()
+		checkRequest(t, conn)
+	})
+}
+
+func FingerprintServerCert(t *testing.T, addr string) string {
+	t.Helper()
+
+	conn, err := tls.Dial("tcp", addr, &tls.Config{InsecureSkipVerify: true})
+	if err != nil {
+		t.Error("failed connect to addr", err)
+		return ""
+	}
+	defer conn.Close()
+	if len(conn.ConnectionState().PeerCertificates) > 0 {
+		return fmt.Sprintf("%x", sha1.Sum(conn.ConnectionState().PeerCertificates[0].Raw))
+	}
+	t.Log("Without certs")
+	return ""
 }

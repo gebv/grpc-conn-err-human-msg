@@ -5,6 +5,17 @@ init:
 	mkdir -p ./ssl
 	mkdir -p ./ca
 
+gen-trusted-ssl: init
+	mkcert -install
+
+	TRUSTEDCAROOT="$(mkcert --CAROOT)"
+
+	cp "${TRUSTEDCAROOT}/rootCA-key.pem" ./ca/trusted.key
+	cp "${TRUSTEDCAROOT}/rootCA.pem" ./ca/trusted.crt
+	cp "${TRUSTEDCAROOT}/rootCA.pem" ./ca/trusted.pem
+
+	CANAME=trusted OUTPATH=./ssl ./ssl-self-signed.sh d localhost-okok localhost
+
 gen-ssl: init
 	CANAME=ok ./ssl-self-signed.sh c
 
@@ -24,7 +35,7 @@ gen-proto: proto-gen-install
 
 run:
 	docker-compose up --build -d app
-	docker-compose up -d sslok sslexpired sslsimple
+	docker-compose up -d sslok sslexpired sslsimple sslokok
 
 test:
 	go test -v ./...
