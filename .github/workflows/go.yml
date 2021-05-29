@@ -21,10 +21,12 @@ jobs:
     - name: Run infra and tools
       run: |
         sudo apt-get install -qy libnss3-tools
-        mkdir -p ${PWD}/bin
-        wget -O ${PWD}/bin/mkcert "https://github.com/FiloSottile/mkcert/releases/download/v1.4.3/mkcert-v1.4.3-linux-amd64"
-        chmod +x ${PWD}/bin/mkcert
-        echo "${PWD}/bin" >> $GITHUB_PATH
+
+        mkdir -p $GITHUB_WORKSPACE/bin
+        wget -O $GITHUB_WORKSPACE/bin/mkcert "https://github.com/FiloSottile/mkcert/releases/download/v1.4.3/mkcert-v1.4.3-linux-amd64"
+        chmod +x $GITHUB_WORKSPACE/bin/mkcert
+        echo "::add-path::$GITHUB_WORKSPACE/bin"
+
         mkcert -version
 
         make gen-trusted-ssl
