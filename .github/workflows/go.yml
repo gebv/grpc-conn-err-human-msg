@@ -40,7 +40,7 @@ jobs:
         echo "ls lha"
         ls -lha /home/runner/.local/share/mkcert
 
-        make gen-trusted-ssl
+        make gen-trusted-ssl-ci-hack
 
         make run
         sleep 5

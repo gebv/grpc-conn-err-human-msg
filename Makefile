@@ -5,14 +5,22 @@ init:
 	mkdir -p ./ssl
 	mkdir -p ./ca
 
-gen-trusted-ssl: init
+gen-trusted-ssl-ci-hack:
 	mkcert -install
 
+	cp "/home/runner/.local/share/mkcert/rootCA-key.pem" ./ca/trusted.key
+	cp "/home/runner/.local/share/mkcert/rootCA.pem" ./ca/trusted.crt
+	cp "/home/runner/.local/share/mkcert/rootCA.pem" ./ca/trusted.pem
+
+	CANAME=trusted OUTPATH=./ssl ./ssl-self-signed.sh d localhost-okok localhost
+
+gen-trusted-ssl: init
+	mkcert -install
 	export TRUSTEDCAROOT="$(mkcert -CAROOT)"
 
-	# cp "${TRUSTEDCAROOT}/rootCA-key.pem" ./ca/trusted.key
-	# cp "${TRUSTEDCAROOT}/rootCA.pem" ./ca/trusted.crt
-	# cp "${TRUSTEDCAROOT}/rootCA.pem" ./ca/trusted.pem
+	cp "${TRUSTEDCAROOT}/rootCA-key.pem" ./ca/trusted.key
+	cp "${TRUSTEDCAROOT}/rootCA.pem" ./ca/trusted.crt
+	cp "${TRUSTEDCAROOT}/rootCA.pem" ./ca/trusted.pem
 
 	# CANAME=trusted OUTPATH=./ssl ./ssl-self-signed.sh d localhost-okok localhost
 
