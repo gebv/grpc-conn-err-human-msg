@@ -31,7 +31,11 @@ jobs:
         echo $GITHUB_PATH
     - name: Get and run infra
       run: |
+        echo "VERSION"
         mkcert -version
+        echo "INSTALL"
+        mkcert -install
+        echo "CAROOT"
         mkcert -CAROOT
 
         make gen-trusted-ssl
