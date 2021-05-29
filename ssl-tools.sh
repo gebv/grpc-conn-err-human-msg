@@ -17,7 +17,7 @@ echo "root CA lifetime '${caDays}' days (env CADAYS)"
 echo
 
 case "$1" in
-    "mkcert-copy-root" | 'croot' )
+    "mkcert-copy-trusted-ca" | 'croot' )
       name=$2
       echo "name '${name}'"
       cp "$(mkcert -CAROOT)/rootCA-key.pem" ${caPath}/$name.key
