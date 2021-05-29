@@ -8,7 +8,7 @@ init:
 gen-trusted-ssl: init
 	mkcert -install
 
-	TRUSTEDCAROOT="$(mkcert --CAROOT)"
+	TRUSTEDCAROOT="$(mkcert -CAROOT)"
 
 	cp "${TRUSTEDCAROOT}/rootCA-key.pem" ./ca/trusted.key
 	cp "${TRUSTEDCAROOT}/rootCA.pem" ./ca/trusted.crt
